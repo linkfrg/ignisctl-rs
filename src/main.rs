@@ -7,6 +7,7 @@ mod misc_utils;
 #[derive(Parser)]
 #[command(version)]
 #[command(about, long_about = None)]
+#[command(arg_required_else_help = true)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
