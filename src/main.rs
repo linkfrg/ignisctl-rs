@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 
 mod calls;
 mod dbus_utils;
+mod misc_utils;
 
 #[derive(Parser)]
 #[command(version)]
@@ -68,7 +69,7 @@ fn main() {
         Some(Commands::CloseWindow { window_name }) => calls::close_window(window_name),
         Some(Commands::ToggleWindow { window_name }) => calls::toggle_window(window_name),
         Some(Commands::RunPython { code }) => calls::run_python(code),
-        Some(Commands::RunFile { path }) => calls::run_file(path),
+        Some(Commands::RunFile { path }) => calls::run_file(&misc_utils::resolve_path(path)),
         None => {}
     }
 }
