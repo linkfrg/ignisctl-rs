@@ -1,2 +1,5 @@
 /target
 .artifacts
+.direnv
+result
+.envrc
