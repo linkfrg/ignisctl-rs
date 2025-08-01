@@ -3,46 +3,32 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
-    systems.url = "github:nix-systems/default-linux";
-
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
   };
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
     ...
-  }:
-    flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = import nixpkgs {inherit system;};
-      in {
-        packages = rec {
-          ignisctl-rs = pkgs.callPackage ./nix {};
-          default = ignisctl-rs;
-        };
-        apps = rec {
-          ignisctl-rs = flake-utils.lib.mkApp {drv = self.packages.${system}.ignisctl-rs;};
-          default = ignisctl-rs;
-        };
+  }: let
+    systems = ["x86_64-linux" "aarch64-linux"];
+    forAllSystems = nixpkgs.lib.genAttrs systems;
+  in {
+    packages = forAllSystems (system: {
+      ignisctl-rs = nixpkgs.legacyPackages.${system}.callPackage ./nix {};
+      default = self.packages.${system}.ignisctl-rs;
+    });
 
-        formatter = pkgs.alejandra;
+    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
-        devShells = {
-          default = pkgs.mkShell {
-            packages = with pkgs; [
-              cargo
-            ];
-          };
-        };
-      }
-    )
-    // {
-      overlays.default = final: prev: {inherit (self.packages.${prev.system}) ignisctl-rs;};
-    };
+    devShells = forAllSystems (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      default = pkgs.mkShell {
+        packages = with pkgs; [
+          cargo
+        ];
+      };
+    });
+    overlays.default = final: prev: {inherit (self.packages.${prev.system}) ignisctl-rs;};
+  };
 }
