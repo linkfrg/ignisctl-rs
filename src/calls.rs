@@ -44,7 +44,7 @@ pub fn run_command(command_name: &String, command_args: &Vec<String>) {
 
     println!("{command_output}");
 
-    if command_error != "" {
+    if !command_error.is_empty() {
         eprintln!("No such command: '{}'", command_error);
     }
 }

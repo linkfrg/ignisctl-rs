@@ -27,11 +27,11 @@ pub trait ExitOnDBusError<T> {
 impl<T> ExitOnDBusError<T> for ZbusResult<T> {
     fn or_exit(self) -> T {
         self.unwrap_or_else(|e| {
-            if let ZBusError::MethodError(err, _, _) = &e {
-                if err.as_str() == "org.freedesktop.DBus.Error.ServiceUnknown" {
-                    eprintln!("Ignis is not running.");
-                    std::process::exit(1);
-                }
+            if let ZBusError::MethodError(err, _, _) = &e
+                && err.as_str() == "org.freedesktop.DBus.Error.ServiceUnknown"
+            {
+                eprintln!("Ignis is not running.");
+                std::process::exit(1);
             }
 
             eprintln!("D-Bus error occured: {e}");

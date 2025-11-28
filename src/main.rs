@@ -13,6 +13,7 @@ struct Cli {
     command: Option<Commands>,
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Subcommand)]
 enum Commands {
     /// Open a window.
@@ -88,6 +89,6 @@ fn main() {
         }) => calls::run_command(command_name, command_args),
         Some(Commands::RunPython { code }) => calls::run_python(code),
         Some(Commands::RunFile { path }) => calls::run_file(&misc_utils::resolve_path(path)),
-        None => {}
+        _ => {}
     }
 }
