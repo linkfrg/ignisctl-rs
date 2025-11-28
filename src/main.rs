@@ -33,8 +33,20 @@ enum Commands {
         window_name: String,
     },
 
+    /// Run a command by its name.
+    RunCommand {
+        /// The name of the command
+        command_name: String,
+
+        /// Arguments to pass to the command
+        command_args: Vec<String>,
+    },
+
     /// List names of all windows.
     ListWindows {},
+
+    /// List names of all commands.
+    ListCommands {},
 
     /// Execute a Python code inside the running Ignis process.
     RunPython {
@@ -63,12 +75,17 @@ fn main() {
 
     match &cli.command {
         Some(Commands::ListWindows {}) => calls::list_windows(),
+        Some(Commands::ListCommands {}) => calls::list_commands(),
         Some(Commands::Quit {}) => calls::quit(),
         Some(Commands::Reload {}) => calls::reload(),
         Some(Commands::Inspector {}) => calls::inspector(),
         Some(Commands::OpenWindow { window_name }) => calls::open_window(window_name),
         Some(Commands::CloseWindow { window_name }) => calls::close_window(window_name),
         Some(Commands::ToggleWindow { window_name }) => calls::toggle_window(window_name),
+        Some(Commands::RunCommand {
+            command_name,
+            command_args,
+        }) => calls::run_command(command_name, command_args),
         Some(Commands::RunPython { code }) => calls::run_python(code),
         Some(Commands::RunFile { path }) => calls::run_file(&misc_utils::resolve_path(path)),
         None => {}

@@ -7,6 +7,7 @@ use zbus::{Error as ZBusError, Result as ZbusResult, blocking::Connection, proxy
 )]
 pub trait IgnisIpc {
     fn list_windows(&self) -> ZbusResult<Vec<String>>;
+    fn list_commands(&self) -> ZbusResult<Vec<String>>;
     fn inspector(&self) -> ZbusResult<()>;
     fn reload(&self) -> ZbusResult<()>;
     fn quit(&self) -> ZbusResult<()>;
@@ -14,6 +15,7 @@ pub trait IgnisIpc {
     fn open_window(&self, name: &String) -> ZbusResult<bool>;
     fn close_window(&self, name: &String) -> ZbusResult<bool>;
     fn toggle_window(&self, name: &String) -> ZbusResult<bool>;
+    fn run_command(&self, name: &String, args: &Vec<String>) -> ZbusResult<(String, String)>;
     fn run_python(&self, code: &String) -> ZbusResult<()>;
     fn run_file(&self, path: &String) -> ZbusResult<()>;
 }

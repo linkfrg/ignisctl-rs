@@ -27,11 +27,30 @@ macro_rules! call_window_op {
     };
 }
 
-pub fn list_windows() {
-    for win in create_manager().list_windows().or_exit() {
-        println!("{win}");
+macro_rules! call_print_list {
+    ($method:ident) => {
+        pub fn $method() {
+            for obj in create_manager().$method().or_exit() {
+                println!("{obj}");
+            }
+        }
+    };
+}
+
+pub fn run_command(command_name: &String, command_args: &Vec<String>) {
+    let (command_output, command_error) = create_manager()
+        .run_command(command_name, command_args)
+        .or_exit();
+
+    println!("{command_output}");
+
+    if command_error != "" {
+        eprintln!("No such command: '{}'", command_error);
     }
 }
+
+call_print_list!(list_windows);
+call_print_list!(list_commands);
 
 call_window_op!(open_window);
 call_window_op!(close_window);
