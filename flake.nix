@@ -3,14 +3,21 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     self,
     nixpkgs,
+    rust-overlay,
     ...
   }: let
     systems = ["x86_64-linux" "aarch64-linux"];
+    overlays = [rust-overlay.overlays.default];
     forAllSystems = nixpkgs.lib.genAttrs systems;
   in {
     packages = forAllSystems (system: {
@@ -21,11 +28,11 @@
     formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
     devShells = forAllSystems (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {inherit system overlays;};
     in {
       default = pkgs.mkShell {
         packages = with pkgs; [
-          cargo
+          rust-bin.stable.latest.default
         ];
       };
     });
